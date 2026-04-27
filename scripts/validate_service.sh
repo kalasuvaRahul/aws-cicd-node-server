@@ -16,13 +16,13 @@ HEALTH_URL="http://127.0.0.1:${PORT}/health"
 
 echo "Validating service at ${HEALTH_URL}..."
 
-for attempt in {1..12}; do
-  if curl --silent --fail "$HEALTH_URL" > /dev/null; then
+for attempt in {1..24}; do
+  if curl --silent --show-error --fail --max-time 5 "$HEALTH_URL" > /dev/null; then
     echo "Service is healthy."
     exit 0
   fi
 
-  echo "Attempt ${attempt}/12 failed; retrying in 5 seconds..."
+  echo "Attempt ${attempt}/24 failed; retrying in 5 seconds..."
   sleep 5
 done
 
