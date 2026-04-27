@@ -9,11 +9,6 @@ permissions:
     pattern: "**"
     owner: ubuntu
     group: ubuntu
-  - object: /var/www/aws-cicd-node-server/scripts
-    pattern: "**"
-    owner: ubuntu
-    group: ubuntu
-    mode: 755
 hooks:
   BeforeInstall:
     - location: scripts/before_install.sh
