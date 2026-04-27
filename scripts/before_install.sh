@@ -2,23 +2,12 @@
 set -euo pipefail
 
 APP_DIR="/var/www/aws-cicd-node-server"
-PID_FILE="$APP_DIR/app.pid"
+APP_NAME="aws-cicd-node-server"
 
 echo "Stopping existing application process (if any)..."
 
-if [ -f "$PID_FILE" ]; then
-  PID="$(cat "$PID_FILE")"
-  if [ -n "$PID" ] && kill -0 "$PID" 2>/dev/null; then
-    kill "$PID"
-    sleep 2
-    if kill -0 "$PID" 2>/dev/null; then
-      kill -9 "$PID"
-    fi
-  fi
-  rm -f "$PID_FILE"
-fi
-
-# Fallback cleanup in case the previous run missed PID tracking.
-pkill -f "node dist/index.js" || true
+# Stop and remove previous PM2 process if present.
+pm2 stop "$APP_NAME" || true
+pm2 delete "$APP_NAME" || true
 
 mkdir -p "$APP_DIR/logs"

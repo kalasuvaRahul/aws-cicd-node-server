@@ -2,23 +2,17 @@
 set -euo pipefail
 
 APP_DIR="/var/www/aws-cicd-node-server"
-PID_FILE="$APP_DIR/app.pid"
-LOG_FILE="$APP_DIR/logs/app.log"
+APP_NAME="aws-cicd-node-server"
 
 echo "Starting application..."
 cd "$APP_DIR"
 
-# Clean up stale PID if it exists.
-if [ -f "$PID_FILE" ]; then
-  OLD_PID="$(cat "$PID_FILE")"
-  if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
-    kill "$OLD_PID" || true
-    sleep 2
-  fi
-  rm -f "$PID_FILE"
+# Start with PM2 on first deploy; restart/reload on subsequent deployments.
+if pm2 describe "$APP_NAME" > /dev/null 2>&1; then
+  pm2 reload ecosystem.config.js --env production
+else
+  pm2 start ecosystem.config.js --env production
 fi
 
-nohup npm start > "$LOG_FILE" 2>&1 &
-echo $! > "$PID_FILE"
-
-echo "Application started with PID $(cat "$PID_FILE")"
+pm2 save
+echo "Application started with PM2."
