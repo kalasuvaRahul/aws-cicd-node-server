@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 app.get("/", (_req: Request, res: Response) => {
   return res.status(200).json({
-    message: "Server is running successfully",
+    message: "Server is running successfullyssssssssssss",
     environment: process.env.NODE_ENV || "development",
   });
 });

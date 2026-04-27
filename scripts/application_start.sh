@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-APP_DIR="/home/ec2-user/aws-cicd-node-server"
+APP_DIR="/var/www/aws-cicd-node-server"
 PID_FILE="$APP_DIR/app.pid"
 LOG_FILE="$APP_DIR/logs/app.log"
 

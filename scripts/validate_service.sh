@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-APP_DIR="/home/ec2-user/aws-cicd-node-server"
+APP_DIR="/var/www/aws-cicd-node-server"
 cd "$APP_DIR"
 
 PORT=3000
