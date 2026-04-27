@@ -1,7 +1,8 @@
 node_modules
-dist
-.env
-.DS_Store
 npm-debug.log
-logs/*.log
+dist
+.git
+.gitignore
+logs
+infra
 *.pem

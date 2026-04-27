@@ -3,23 +3,34 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 20
+      nodejs: 22
     commands:
-      - npm ci
+      - echo "Install phase started"
+      - aws --version
 
   pre_build:
     commands:
+      - echo "Authenticating to ECR..."
+      - AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+      - AWS_REGION="${AWS_DEFAULT_REGION:-ap-south-1}"
+      - ECR_REPOSITORY="aws-cicd-node-server"
+      - ECR_REPOSITORY_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}"
+      - aws ecr describe-repositories --repository-names "$ECR_REPOSITORY" --region "$AWS_REGION" >/dev/null 2>&1 || aws ecr create-repository --repository-name "$ECR_REPOSITORY" --region "$AWS_REGION"
+      - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
       - npm run test
 
   build:
     commands:
-      - npm run build
+      - echo "Building and pushing Docker image..."
+      - IMAGE_TAG="${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}"
+      - SHORT_TAG="$(echo "$IMAGE_TAG" | cut -c1-7)"
+      - docker build -t "${ECR_REPOSITORY_URI}:latest" -t "${ECR_REPOSITORY_URI}:${SHORT_TAG}" .
+      - docker push "${ECR_REPOSITORY_URI}:latest"
+      - docker push "${ECR_REPOSITORY_URI}:${SHORT_TAG}"
+      - printf '{"image_uri":"%s"}' "${ECR_REPOSITORY_URI}:latest" > image.json
 
 artifacts:
   files:
-    - dist/**/*
-    - package.json
-    - package-lock.json
     - appspec.yml
-    - ecosystem.config.js
+    - image.json
     - scripts/**/*

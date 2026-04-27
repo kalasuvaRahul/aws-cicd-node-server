@@ -2,6 +2,7 @@
 set -euo pipefail
 
 APP_DIR="/var/www/aws-cicd-node-server"
+CONTAINER_NAME="aws-cicd-node-server"
 cd "$APP_DIR"
 
 PORT=3000
@@ -15,6 +16,11 @@ fi
 HEALTH_URL="http://127.0.0.1:${PORT}/health"
 
 echo "Validating service at ${HEALTH_URL}..."
+
+if ! sudo docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+  echo "Container ${CONTAINER_NAME} is not running."
+  exit 1
+fi
 
 for attempt in {1..24}; do
   if curl --silent --show-error --fail --max-time 5 "$HEALTH_URL" > /dev/null; then

@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-APP_NAME="aws-cicd-node-server"
+CONTAINER_NAME="aws-cicd-node-server"
 
-echo "Stopping application in PM2 (if running)..."
-pm2 stop "$APP_NAME" || true
+echo "Stopping Docker container if running..."
+sudo docker stop "$CONTAINER_NAME" >/dev/null 2>&1 || true
+sudo docker rm "$CONTAINER_NAME" >/dev/null 2>&1 || true
